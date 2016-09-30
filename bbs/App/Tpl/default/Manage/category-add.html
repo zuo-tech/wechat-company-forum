@@ -1,0 +1,133 @@
+﻿<include file="common-header" />
+    <style type="text/css">
+    	body{padding-top:60px;}
+    	.badge {
+		    background-color: #337ab7;
+		    color: #fff;
+		}
+
+@charset "UTF-8";
+/*
+ * jQuery File Upload Plugin CSS
+ * https://github.com/blueimp/jQuery-File-Upload
+ *
+ * Copyright 2013, Sebastian Tschan
+ * https://blueimp.net
+ *
+ * Licensed under the MIT license:
+ * http://www.opensource.org/licenses/MIT
+ */
+
+.fileinput-button {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+}
+.fileinput-button input {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  opacity: 0;
+  -ms-filter: 'alpha(opacity=0)';
+  font-size: 200px !important;
+  direction: ltr;
+  cursor: pointer;
+}
+
+/* Fixes for IE < 8 */
+@media screen\9 {
+  .fileinput-button input {
+    filter: alpha(opacity=0);
+    font-size: 100%;
+    height: 100%;
+  }
+}
+    </style>
+    
+
+	
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+	<include file="common-nav" />
+    <!-- Begin page content -->
+    <div class="container">
+    
+    
+    <div class="bs-example" data-example-id="default-media">
+    
+    <div class="media">
+      <div class="media-body">
+        <form method="post" action="{:U()}" />
+		  <div class="form-group">
+			<input name="title" type="text" class="form-control" placeholder="分类名称" />
+		  </div>
+		  
+		  <div class="form-group">
+			<textarea name="description" class="form-control" rows="8" placeholder="分类描述"></textarea>
+		  </div>
+		  <div class="form-group">
+		      <div id="priview">
+			    </div>
+			    <canvas id="canvas" class="hide"></canvas>
+		  
+		  </div>
+		  <div class="form-group" id="comment">
+		  
+		    <input type="submit" id="submit" class="btn btn-success fileinput-button pull-right" />
+		  </div>
+		  
+		</form>
+        
+        
+      </div>
+      
+    </div>
+  </div>
+		  
+	</div>
+    
+
+
+<include file="common-footer" />
+    <!-- 模态框 -->
+<div class="modal fade" id="subcomment" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="exampleModalLabel">正在上传</h4>
+      </div>
+      <div class="modal-body">
+			    <div class="progress">
+			      <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+			        <span class="sr-only">0% Complete</span>
+			      </div>
+			    </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+$(function(){
+	
+	$("form").submit(function(){
+		if( $("input[name=title]").val() == ""){
+			
+			$("input[name=title]").focus();
+			return false;
+		}
+		if( $("textarea[name=description]").val() == ""){
+			$("textarea[name=description]").focus();
+			return false;
+		}
+	})
+})
+
+</script>
+  </body>
+</html>

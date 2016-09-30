@@ -1,0 +1,200 @@
+﻿<include file="common-header" />
+    <style type="text/css">
+    .media{border-bottom:1px solid #f1f1f1;}
+			.help-block.text-left span {
+			    margin-left: 3px;
+			}
+			a.list-group-item{border:none}
+    </style>
+  </head>
+
+  <body>
+    <!-- Fixed navbar -->
+	<include file="common-nav" />
+
+    <!-- Begin page content -->
+    <div class="container">
+    <!-- Split button -->
+    <h4>最新发现</h4>
+
+		<div class="row">  
+		    
+		<div class="list-group">
+		<volist name="data" id="d">
+			<div class="list-group-item ">
+				<div class="media">
+					<div class="media-left"><img class="center-block img-circle" src="<if condition='$d.isshow eq 1'>{$default_avatar}<else />{$d.avatar|default=$default_avatar}64</if>"  ></div>
+					<div class="media-body">
+						<h5 class="list-group-item-heading"><a href="{:U('detail',array('id'=>$d[id]))}" >{$d.title}</a> 
+						</h5>
+						<p class=" help-block text-left"><small> <if condition="$d.isshow eq 1">匿名<else />{$d.name}</if> {$d.create_date|date="m月d",###} </small>
+						</p>
+						<p class="list-group-item-text">{$d.text}...</p>
+						<h5 class="help-block text-right">
+								
+						
+						<small class=""> 
+						<i class="icon-eye-open"></i> ({$d.view_count}) &nbsp; &nbsp;
+						<i class="icon-comment-alt"></i> ({$d.cc})
+    						</small>
+						</h5>
+						<p>
+							<a href="{:U('forum_edit' ,array('id'=>$d[id]))}" class="btn btn-success btn-xs ">编辑</a>
+							<a href="{:U('forum_delete' ,array('id'=>$d[id]))}"  class="btn btn-success btn-xs del">删除</a>	
+							<a href="{:U('forum_status' ,array('id'=>$d[id]))}" class="btn btn-success btn-xs status"><if condition="$d['status'] eq 1" >取消审核<else />审核</if></a>
+							<a href="{:U('forum_top' ,array('id'=>$d[id]))}" class="btn btn-success btn-xs top"><if condition="$d[istop] eq 1" >取消置顶<else />置顶</if></a>
+						
+						</p>
+						
+					</div>
+					            
+				</div>
+			</div>
+		</volist>
+
+			<a href="#" id="Loading" class="list-group-item text-center" data-id="{$id}" data-page="1" >
+				加载更多 
+			</a>
+		      
+		</div>
+		    
+		</div>  
+	</div>
+    
+	<include file="common-footer" />
+<script src="__PUBLIC__/js/notify.js"></script>
+    <script>
+    $(function(){
+
+    	
+    	
+    	$(".list-group").on('click',".del",function(){
+    		var js = $(this);
+    		$.confirm({
+        	    title: false,
+        	    content: '删除将不可恢复!',
+        	    confirmButton:"确定",
+        	    cancelButton:"取消",
+        	    closeIcon: false,
+        	    theme: 'black',
+        	    backgroundDismiss: false,
+        	    confirm: function(){
+        	    	var url = js.attr("href")
+        	        $.post(
+        	        		url,{},function(d){
+        	        			js.parents(".list-group-item ").remove();
+        	        		}
+        	        		
+        	        );
+        	    },
+        	    cancel: function(){
+        	        
+        	    }
+        	});
+    		return false;
+    		
+    	}) 
+    	$(".list-group").on('click',".status",function(){
+    		var js = $(this);
+    		$.post(js.attr("href"),{
+    			
+    		},function(d){
+    			if(d == 1){
+    				var t = js.text();
+    				if(t == "审核"){
+    					
+    					js.text("取消审核");
+    				}else{
+    					js.text("审核");
+    				}
+    			}
+    		})
+    		return false;
+    		
+    	}) 
+    	$(".list-group").on('click',".top",function(){
+    		var js = $(this);
+    		$.post(js.attr("href"),{
+    			
+    		},function(d){
+    			if(d == 1){
+    				var t = js.text();
+    				if(t == "置顶"){
+    					
+    					js.text("取消置顶");
+    				}else{
+    					js.text("置顶");
+    				}
+    				
+    			}
+    		})
+    		return false;
+    		
+    	}) 
+    	
+    	
+    	
+        //自动加载
+        var stop=true;
+        $(window).scroll(function(){
+        	
+        	
+            totalheight = parseFloat($(window).height()) + parseFloat($(window).scrollTop());
+            
+            if($(document).height() <= totalheight){
+            	
+                if(stop==true){
+                	$("#Loading").html("正在加载<i class='icon-spinner icon-spin'></i>");
+                    stop=false;
+                    $.post("{:U('listajax')}", {
+                    		id:$("#Loading").attr("data-id"),
+                    		page:$("#Loading").attr("data-page"),
+                    	
+                    	},function(txt){
+                    		if(txt != ""){
+                    			
+    	                        $("#Loading").before(txt);
+    	                        $("#Loading").html("加载更多");
+    	                        $("#Loading").attr("data-page",parseInt($("#Loading").attr("data-page")) + 1);
+                            	stop=true;
+                    			
+                    		}else{
+                    			$("#Loading").html("没有更多");
+                    		}
+                    },"text");
+                }
+            }
+        });
+        
+    	$("#Loading").click(function(){
+            if(stop==true){
+            	$("#Loading").html("正在加载<i class='icon-spinner icon-spin'></i>");
+                stop=false;
+                $.post("{:U('listajax')}", {
+                		id:$("#Loading").attr("data-id"),
+                		page:$("#Loading").attr("data-page"),
+                	
+                	},function(txt){
+                		if(txt != ""){
+                			
+	                        $("#Loading").before(txt);
+	                        $("#Loading").html("加载更多");
+	                        $("#Loading").attr("data-page",parseInt($("#Loading").attr("data-page")) + 1);
+                        	stop=true;
+                			
+                		}else{
+                			$("#Loading").html("没有更多");
+                		}
+                },"text");
+            }
+
+    		return false;
+    	})
+
+    	
+    	
+    	
+    })
+    </script>
+  </body>
+</html>

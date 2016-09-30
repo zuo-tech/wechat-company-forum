@@ -1,0 +1,125 @@
+﻿<include file="common-header" />
+    <style type="text/css">
+    	body{padding-top:10px;}
+    	.badge {
+		    background-color: #337ab7;
+		    color: #fff;
+		}
+
+@charset "UTF-8";
+/*
+ * jQuery File Upload Plugin CSS
+ * https://github.com/blueimp/jQuery-File-Upload
+ *
+ * Copyright 2013, Sebastian Tschan
+ * https://blueimp.net
+ *
+ * Licensed under the MIT license:
+ * http://www.opensource.org/licenses/MIT
+ */
+
+.fileinput-button {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+}
+.fileinput-button input {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  opacity: 0;
+  -ms-filter: 'alpha(opacity=0)';
+  font-size: 200px !important;
+  direction: ltr;
+  cursor: pointer;
+}
+
+/* Fixes for IE < 8 */
+@media screen\9 {
+  .fileinput-button input {
+    filter: alpha(opacity=0);
+    font-size: 100%;
+    height: 100%;
+  }
+}
+    </style>
+    
+
+	
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+
+    <!-- Begin page content -->
+    <div class="container">
+    
+    
+    <div class="bs-example" data-example-id="default-media">
+    
+    <div class="media">
+      <div class="media-body">
+        <form>
+		  <div class="form-group">
+		  	<label class="control-label" for="">选择话题</label>
+  			<select class="form-control" name="category_id">
+  			<volist name="category" id="v">
+  				<option value="{$v.id}">{$v.title}</option>
+  			</volist>
+  			</select>
+		  </div>
+		  <div class="form-group">
+			<input name="title" type="text" class="form-control" placeholder="标题" />
+		  </div>
+		  
+		  <div class="form-group">
+			 <div class="checkbox">
+				<label><input name="isshow" type="checkbox"> 匿名发表</label>
+		      </div>
+		  </div>
+		  <div class="form-group">
+			<textarea name="content" class="form-control" rows="8" placeholder=""></textarea>
+		  </div>
+		  <div class="form-group">
+		      <div id="priview">
+			    </div>
+			    <canvas id="canvas" class="hide"></canvas>
+		  
+		  </div>
+		  <div class="form-group" id="comment">
+		  
+		  <span class="btn btn-default fileinput-button" ng-class="{disabled: disabled}">
+                    <i class="glyphicon glyphicon-camera"></i>
+                    <span></span>
+                    <input type="file" name="files[]"   accept="image/jpeg,image/png,image/gif" multiple  ng-disabled="disabled">
+                </span>
+		    <button type="submit" id="submit" data-target="{:U('release_process')}" class="btn btn-success fileinput-button pull-right">发表</button>
+		  </div>
+		  
+		</form>
+        
+        
+      </div>
+      
+    </div>
+  </div>
+		  
+	</div>
+    
+
+
+<include file="common-footer" />
+    <!-- 模态框 -->
+<div class="modal fade" id="subcomment" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel">
+	    <div class="progress">
+	      <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 30%;">
+	        <span class="sr-only">0% Complete</span>
+	      </div>
+	    </div>
+</div>
+
+<script src="__PUBLIC__/js/image-zip.js"></script>
+  </body>
+</html>

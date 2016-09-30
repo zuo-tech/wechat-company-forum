@@ -1,0 +1,20 @@
+﻿<volist name="comment" id="c">
+<div class="media">
+<div class="media-left">
+<a href="#">
+<img class="img-circle"  src="{$c.avatar|default=$default_avatar}64" >
+</a>
+</div>
+<div class="media-body">
+<h5 class="media-heading"><a>{$c.name} </a><if condition="$c.cm_name neq '' "> <small>回复</small> {$c.cm_name}</if> <small>  {$c.create_date|date="m月d",###} </small></h5>
+<p class="content">{$c.content}</p>
+<h6 class="text-right">
+<i class="icon-comment-alt " data-whatever="{$c.name}" data-pid="{$c.id}"></i> ({$c.ct}) 
+</h6>
+<p>
+<a href="{:U('comment_edit' ,array('id'=>$c[id]))}" class="btn btn-success btn-xs edit">编辑</a>						
+<a href="{:U('comment_delete' ,array('id'=>$c[id]))}"  class="btn btn-success btn-xs del">删除</a>	
+</p>
+</div>
+</div>
+</volist>

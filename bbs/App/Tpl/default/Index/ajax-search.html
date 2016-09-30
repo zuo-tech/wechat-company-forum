@@ -1,0 +1,11 @@
+﻿<volist name="data" id="d">
+<a href="{:U('detail',array('id'=>$d[id]))}" class="list-group-item ">
+<div class="media">
+<div class="media-left"><img class="center-block img-circle" src="<if condition='$d.isshow eq 1'>{$default_avatar}<else />{$d.avatar|default=$default_avatar}64</if>"  ></div>
+<div class="media-body">
+<h5 class="list-group-item-heading">{$d.title}<span class="red small pull-right"><if condition="$d.istop eq 1">顶</if></span></h5>
+<p class=" help-block text-left"><small> <if condition="$d.isshow eq 1">匿名<else />{$d.name}</if> {$d.create_date|date="m月d",###} </small></p>
+</div>
+</div>
+</a>
+</volist>

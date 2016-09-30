@@ -1,0 +1,80 @@
+﻿<include file="common-header" />
+    <style type="text/css">
+	.imgheader{font-size:22px;}
+    </style>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+
+    <!-- Begin page content -->
+    <div class="container">
+    <!-- Split button -->
+    
+    	<h4>热门话题</h4>
+		<div class="row">  
+		    
+		<div class="list-group">
+		
+		<volist name="data" id="d" >
+			<a href="{:U('forum' ,array('id'=>$d[id]))}" class="list-group-item ">
+				<div class="media">
+					<div class="media-left"><i class="icon-comment-alt imgheader"></i>
+					</div>
+					<div class="media-body">
+						<h6 class="list-group-item-heading">{$d.title}</h6>
+						<p class="list-group-item-text">{$d.description}...</p>
+						<p class="help-block text-right">
+						<small> 
+						 {$d.ct} 个话题
+						</small>
+						</p>
+					</div>
+					            
+				</div>
+			</a>
+		</volist>
+			<a href="#" id="Loading" class="list-group-item text-center">
+				点击加载更多 
+			</a>
+		      
+		</div>
+		    
+		</div>  
+	</div>
+    
+    <include file="common-footer" />
+    
+    <script>
+    $(function(){
+    	
+        //自动加载
+        var stop=true;
+        $("#Loading").click(function(){
+        	
+        	
+            totalheight = parseFloat($(window).height()) + parseFloat($(window).scrollTop());
+            
+            if($(document).height() <= totalheight){
+            	console.log(totalheight)
+            	$("#Loading").html("正在加载<i class='icon-spinner icon-spin'></i>");
+                if(stop==true){
+                    stop=false;
+                    $.post("{:U('listajax')}", {state:2, n:50},function(txt){
+                        $("#Loading").before(txt);
+                        $("#Loading").html("加载更多");
+                        stop=true;
+                    },"text");
+                }
+            }
+        });
+        
+        
+    	
+    	
+    	
+    })
+    </script>
+  </body>
+</html>

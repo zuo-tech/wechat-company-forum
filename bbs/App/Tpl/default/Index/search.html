@@ -1,0 +1,131 @@
+﻿<include file="common-header" />
+    <style type="text/css">
+
+    </style>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+
+
+    <!-- Begin page content -->
+    <div class="container">
+    <!-- Split button -->
+<form method="post">
+	<div class="form-group">
+	  <label class="sr-only" for="exampleInputAmount">Amount (in dollars)</label>
+	  <div class="input-group">
+	    <input type="text" name="key" class="form-control" required id="key" placeholder="">
+	    <span id="search" class="input-group-addon ">搜索</span>
+	  </div>
+	</div>
+</form>
+
+		<div class="row">  
+		    
+		<div class="list-group">
+		<volist name="data" id="d">
+			<a href="{:U('detail',array('id'=>$d[id]))}" class="list-group-item ">
+				<div class="media">
+					<div class="media-left"><img class="center-block img-circle" src="<if condition='$d.isshow eq 1'>{$default_avatar}<else />{$d.avatar|default=$default_avatar}64</if>"  ></div>
+					<div class="media-body">
+						<h5 class="list-group-item-heading">{$d.title}<span class="red small pull-right"><if condition="$d.istop eq 1">顶</if></span></h5>
+						<p class=" help-block text-left"><small> <if condition="$d.isshow eq 1">匿名<else />{$d.name}</if> {$d.create_date|date="m月d",###} </small></p>
+						<p class="list-group-item-text">{$d.text}...</p>
+						<h5 class="help-block text-right">
+						<small> 
+						<i class="icon-eye-open"></i> ({$d.view_count}) &nbsp; &nbsp;
+						<i class="icon-comment-alt"></i> ({$d.cc})
+    						</small>
+						</h5>
+						
+					</div>
+					            
+				</div>
+			</a>
+		</volist>
+
+		      
+		</div>
+			<a href="#" id="Loading" class="list-group-item text-center" data-id="{$id}" data-page="1" >
+				加载更多 
+			</a>
+		    
+		</div>  
+	</div>
+    
+	<include file="common-footer" />
+
+    <script>
+    $(function(){
+    	
+    	$('#search').click(function(){
+    		
+    		$('form').submit();
+    	})
+    	$('form').submit(function(){
+    		
+    		if( $("input[name=key]").val() == "" ){
+    			$("input[name=key]").focus()
+    			return false;
+    			
+    		}
+    		
+    		$.post("{:U('search_ajax')}",$("form").serialize(),function(d){
+    			
+    			$('.list-group').html('')
+    			.append(d)
+                $("#Loading").html("加载更多");
+            	stop=true;
+
+    		})
+    		
+    		return false;
+    		
+    	})
+    	
+        //自动加载
+        var stop=true;
+        $(window).scroll(function(){
+        	
+        	
+            totalheight = parseFloat($(window).height()) + parseFloat($(window).scrollTop());
+            
+            if($(document).height() <= totalheight){
+            	console.log(totalheight)
+            	
+                if(stop==true){
+                	$("#Loading").html("正在加载<i class='icon-spinner icon-spin'></i>");
+                    stop=false;
+                    $.post("{:U('search_ajax')}", {
+                    		key:$("#key").val(),
+                    		page:$("#Loading").attr("data-page"),
+                    	
+                    	},function(txt){
+                    		if(txt != ""){
+                    			
+    	                        $(".list-group").append(txt);
+    	                        $("#Loading").html("加载更多");
+    	                        $("#Loading").attr("data-page",parseInt($("#Loading").attr("data-page")) + 1);
+                            	stop=true;
+                    			
+                    		}else{
+                    			$("#Loading").html("没有更多");
+                    		}
+                    },"text");
+                }
+            }
+        });
+    	$("#Loading").click(function(){
+    		
+    		$(window).scroll();
+    		return false;
+    	})
+
+    	
+    	
+    })
+    </script>
+  </body>
+</html>

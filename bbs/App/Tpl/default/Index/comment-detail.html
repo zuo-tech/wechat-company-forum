@@ -1,0 +1,160 @@
+﻿<include file="common-header" />
+<link href="__PUBLIC__/bootstrap-notify.css" rel="stylesheet">
+    <style type="text/css">
+    	body{padding-top:10px;}
+    	.badge {
+		    background-color: #337ab7;
+		    color: #fff;
+		}
+		.media-body{
+			border-top: 1px solid #f1f1f1;
+   			 padding-top: 10px;
+		}
+		
+		h4 a:hover, h4 a:focus{
+			text-decoration:none;
+		}
+		.alert {
+   		 padding: 8px;
+   		 }
+
+    </style>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+
+    <!-- Begin page content -->
+    <div class="container">
+    
+    <div class='notifications top-right'></div>
+    <div class="bs-example" data-example-id="default-media">
+     <div class="media">
+        <h4 class="media-heading"><a>{$data.title}</a></h4>
+        <p class=""><small>{$data.name}  {$data.create_date|date="m月d",###}</small></p>
+        <p>{$data.content}</p>
+        <if condition="$data.image neq '' ">
+        <p><img src="__PUBLIC__/Uploads/{$data.image}" /></p>
+        </if>
+        <h6 class="text-right">
+        	<i class="icon-comment-alt" data-whatever="楼主" comment="" > </i> ({$count}) 
+        </h6>
+    </div>
+    
+    
+    <volist name="comment" id="c">
+    <div class="media">
+      <div class="media-left">
+        <a href="#">
+          <img class="img-circle"  src="{$c.avatar|default=$default_avatar}64" >
+        </a>
+      </div>
+      <div class="media-body" data-link="{:U('comment_detail',array('id'=>$c[id]))}">
+        <h5 class="media-heading" ><a>{$c.name}</a> <small>  {$c.create_date|date="m月d",###} </small></h5>
+        <p class="content" >{$c.content}</p>
+        <h6 class="text-right">
+        	<i class="icon-comment-alt " data-whatever="{$c.name}" data-pid="{$c.id}"></i> ({$c.ct}) 
+       	</h6>
+      </div>
+    </div>
+    </volist>
+  </div>
+		  
+	</div>
+    
+
+    <!-- 模态框 -->
+<div class="modal fade" id="subcomment" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="exampleModalLabel">New message</h4>
+      </div>
+      <div class="modal-body">
+        <form>
+        	<input type="hidden" name="category_id" value="{$data.category_id}" />
+        	<input type="hidden" name="forum_id" value="{$data.id}" />
+        	<input type="hidden" name="pid" value=""  />
+            <textarea name="content" class="form-control" id="message-text"></textarea>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+        <button id="comment_submit" type="button" class="btn btn-primary" data-dismiss="modal">评论</button>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<include file="common-footer" />
+<script src="__PUBLIC__/bootstrap-notify.js"></script>
+    <script>
+    $(function(){
+    	
+    	
+    	$(".media-body").click(function(){
+    		
+    		window.location.href=$(this).attr("data-link");
+    	})
+    	
+    	$(".icon-comment-alt").click(function(){
+    		var nickname = $(this).attr('data-whatever');
+    		var pid = $(this).attr("data-pid");
+    		$("input[name=pid]").val(pid);
+    		$("#subcomment").modal();
+    		$("#subcomment").find('.modal-title').text('回复@' + nickname)
+    		return false;
+    		
+    	})
+    	
+    	$("#comment_submit").click(function(){
+    		
+    		if($("textarea[name=content]").val() == ""){
+    			$("textarea[name=content]").focus();
+    			return false;
+    		}
+    		
+    		var formData = new FormData();
+    		var xhr = new XMLHttpRequest();
+    		
+    		formData.append('content',$("textarea[name=content]").val());
+    		formData.append('category_id',$("input[name=category_id]").val());
+    		formData.append('forum_id',$("input[name=forum_id]").val());
+    		formData.append('pid',$("input[name=pid]").val());
+            if( xhr != null){
+                xhr.onreadystatechange = state_change;
+             	xhr.open("post","{:U('comment')}");
+             	xhr.timeout = 30000;
+             	xhr.ontimeout = function(event){
+             		  console('timeout');
+                 	}
+             	//xhr.upload.onprogress = updateprogress;
+             	xhr.send(formData);
+             	
+                    
+             }
+
+            function state_change(){
+                if(xhr.readyState==4 && xhr.status == 200){
+                    console.log(xhr.response);
+                    var text = '<i class="icon-ok" > 评论成功 ! </i> ';
+                    $(".top-right").notify({message:{html:text},type:"success"}).show()
+                }
+            }
+    		
+
+    	})
+
+    	
+    })
+    $('#subcomment').on('shown.bs.modal',function(e){
+
+    	$("#subcomment").find('.modal-body textarea').focus();
+
+	});
+    </script>
+  </body>
+</html>

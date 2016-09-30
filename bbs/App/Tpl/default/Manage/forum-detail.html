@@ -1,0 +1,364 @@
+﻿<include file="common-header" />
+    <style type="text/css">
+    	body{padding-top:10px;}
+    	.badge {
+		    background-color: #337ab7;
+		    color: #fff;
+		}
+		.media-body{
+			border-top: 1px solid #f1f1f1;
+   			 padding-top: 10px;
+		}
+		
+		h4 a:hover, h4 a:focus{
+			text-decoration:none;
+		}
+		.alert {
+   		 	padding: 8px;
+   		 }
+   		 .icon-comment-alt{
+   		 cursor: pointer;
+   		 }
+
+    </style>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+
+    <!-- Begin page content -->
+    <div class="container">
+    
+    <div class='notifications top-right'></div>
+    <div class="bs-example" data-example-id="default-media">
+     <div class="media">
+        <h4 class="media-heading"><a>{$data.title}</a></h4>
+        <p class=""><small>{$data.name}  {$data.create_date|date="m月d",###}</small></p>
+        <p>{$data.content|nl2br}</p>
+        <if condition="$data.image neq '' ">
+        <p>{$data.image|showimage}</p>
+        </if>
+        <h6 class="text-right">
+        	<i class="icon-comment-alt" data-whatever="楼主" comment="" > </i> ({$count}) 
+        </h6>
+		<p>
+			<a href="{:U('forum_edit' ,array('id'=>$data[id]))}" class="btn btn-success btn-xs ">编辑</a>						
+			<a href="{:U('forum_delete' ,array('id'=>$data[id]))}"  class="btn btn-success btn-xs del">删除</a>	
+			<a href="{:U('forum_status' ,array('id'=>$data[id]))}" class="btn btn-success btn-xs status"><if condition="$data['status'] eq 1" >取消审核<else />审核</if></a>
+			<a href="{:U('forum_top' ,array('id'=>$data[id]))}" class="btn btn-success btn-xs top"><if condition="$data[istop] eq 1" >取消置顶<else />置顶</if></a>
+		
+		</p>
+    </div>
+    
+    
+    <volist name="comment" id="c">
+    <div class="media">
+      <div class="media-left">
+        <a href="#">
+          <img class="img-circle"  src="{$c.avatar|default=$default_avatar}64" >
+        </a>
+      </div>
+      <div class="media-body">
+        <h5 class="media-heading"><a>{$c.name} </a><if condition="$c.cm_name neq '' "> <small>回复</small> {$c.cm_name}</if> <small>  {$c.create_date|date="m月d",###} </small></h5>
+        <p class="content">{$c.content|}</p>
+        <h6 class="text-right">
+        	<i class="icon-comment-alt " data-whatever="{$c.name}" data-pid="{$c.id}"></i> ({$c.ct}) 
+       	</h6>
+		<p>
+			<a href="{:U('comment_edit' ,array('id'=>$c[id]))}" class="btn btn-success btn-xs edit">编辑</a>						
+			<a href="{:U('comment_delete' ,array('id'=>$c[id]))}"  class="btn btn-success btn-xs del">删除</a>	
+		</p>
+       	
+      </div>
+    </div>
+    </volist>
+    <a href="#" id="Loading" class="list-group-item text-center" data-id="{$data.id}" data-page="1" >
+				加载更多 
+	</a>
+    
+  </div>
+		  
+	</div>
+    
+
+    <!-- 模态框 -->
+<div class="modal fade" id="subcomment" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <form>
+        <div class="form-group">
+        <h5 class="modal-title"></h5>
+        </div>
+        <div class="form-group">
+        	<input type="hidden" name="category_id" value="{$data.category_id}" />
+        	<input type="hidden" name="forum_id" value="{$data.id}" />
+        	<input type="hidden" name="pid" value=""  />
+            <textarea name="content" class="form-control" id="message-text"></textarea>
+        </div>
+        </form>
+</div>
+
+<include file="common-footer" />
+<script src="__PUBLIC__/js/notify.js"></script>
+<script>
+
+
+    $(function(){
+
+    	$("textarea").scroll();
+    	
+    	$("body").on("click",".edit",function(){
+    		
+    		var js = $(this);
+    		var txt = js.parents(".media-body").find(".content").text()
+    		var ct = '<div class="form-group"><textarea name="content" class="form-control"  >' + txt + '</textarea></div>'
+    		$.confirm({
+    			title:false,
+    			content:ct,
+    			confirm:function(){
+    				
+    				var cm = this.$content.find("textarea").val()
+    				$.post(
+    					js.attr("href"),
+    					{
+    						content:this.$content.find("textarea").val(),
+    					},
+    					function(d){
+    						js.parents(".media-body").find(".content").text(cm)
+    					}
+    				)
+    			},
+    			cancel:function(){
+    				
+    				
+    			}
+    		
+    			
+    		})
+    		return false;
+    	})
+    	$("body").on("click",".del",function(){
+    		
+    		var js = $(this);
+    		$.confirm({
+        	    title: false,
+        	    content: '删除将不可恢复!',
+        	    confirmButton:"确定",
+        	    cancelButton:"取消",
+        	    closeIcon: false,
+        	    theme: 'black',
+        	    backgroundDismiss: false,
+        	    confirm: function(){
+        	    	var url = js.attr("href")
+        	        $.post(
+        	        		url,{},function(d){
+        	        			js.parents(".media ").remove();
+        	        		}
+        	        		
+        	        );
+        	    },
+        	    cancel: function(){
+        	        
+        	    }
+        	});
+    		return false;
+    	})
+    	
+    	$("body").on('click',".status",function(){
+    		
+    		var js = $(this);
+    		$.post(js.attr("href"),{
+    			
+    		},function(d){
+    			if(d == 1){
+    				var t = js.text();
+    				if(t == "审核"){
+    					
+    					js.text("取消审核");
+    				}else{
+    					js.text("审核");
+    				}
+    			}
+    		})
+    		
+    		return false;
+    		
+    	}) 
+    	$("body").on('click',".top",function(){
+    		var js = $(this);
+    		$.post(js.attr("href"),{
+    			
+    		},function(d){
+    			if(d == 1){
+    				var t = js.text();
+    				if(t == "置顶"){
+    					
+    					js.text("取消置顶");
+    				}else{
+    					js.text("置顶");
+    				}
+    				
+    			}
+    		})
+    		return false;
+    		
+    	}) 
+    	
+    	
+    	
+    	$("body").on("click",'.icon-comment-alt',function(){
+    		var cm = $(this);
+    		$(".modal").find("input[name=pid]").val(cm.attr("data-pid"));
+    		$(".modal").find('.modal-title').text('@'+cm.attr("data-whatever"));
+    		$.confirm({
+    			title:false,
+    			content:$(".modal").html(),
+        	    confirmButton:"确定",
+        	    cancelButton:"取消",
+        		onOpen:function(){
+        			this.$content.find("textarea[name=content]").focus();
+        		},
+				confirm:function(){
+    	    		
+    				if(this.$content.find("textarea[name=content]").val() == ""){
+    					this.$content.find("textarea[name=content]").focus();
+    	    			return false;
+    	    		}
+    	    		
+    	    		var formData = new FormData();
+    	    		var xhr = new XMLHttpRequest();
+    	    		
+    	    		formData.append('content',this.$content.find("textarea[name=content]").val());
+    	    		formData.append('category_id',this.$content.find("input[name=category_id]").val());
+    	    		formData.append('forum_id',this.$content.find("input[name=forum_id]").val());
+    	    		formData.append('pid',this.$content.find("input[name=pid]").val());
+    	            if( xhr != null){
+    	                xhr.onreadystatechange = state_change;
+    	             	xhr.open("post","{:U('comment')}");
+    	             	xhr.timeout = 30000;
+    	             	xhr.ontimeout = function(event){
+    	             		  console('timeout');
+    	                 	}
+    	             	//xhr.upload.onprogress = updateprogress;
+    	             	xhr.send(formData);
+    	             	
+    	                    
+    	             }
+
+    	            function state_change(){
+    	                if(xhr.readyState==4 && xhr.status == 200){
+    	                    console.log(xhr.response);
+    	                    var text = '<i class="icon-ok" > 评论成功 ! </i> ';
+    	                    cm.parents("h6").notify("你的评论已经发表 !", "success");
+    	                    //$(".top-right").notify({message:{html:text},type:"success"}).show()
+    	                }
+    	            }
+
+    				
+    			},
+    			cancel:function(){
+    				
+    				
+    			}
+    			
+    		})
+    		return false;
+    		
+    	})
+    	/*
+    	$("body").on("click",".icon-comment-alt",function(){
+    		var nickname = $(this).attr('data-whatever');
+    		var pid = $(this).attr("data-pid");
+    		$("input[name=pid]").val(pid);
+    		$("#subcomment").modal();
+    		$("#subcomment").find('.modal-title').text('回复@' + nickname)
+    		
+    	})
+    	
+    	$("#comment_submit").click(function(){
+    		
+    		if($("textarea[name=content]").val() == ""){
+    			$("textarea[name=content]").focus();
+    			return false;
+    		}
+    		
+    		var formData = new FormData();
+    		var xhr = new XMLHttpRequest();
+    		
+    		formData.append('content',$("textarea[name=content]").val());
+    		formData.append('category_id',$("input[name=category_id]").val());
+    		formData.append('forum_id',$("input[name=forum_id]").val());
+    		formData.append('pid',$("input[name=pid]").val());
+            if( xhr != null){
+                xhr.onreadystatechange = state_change;
+             	xhr.open("post","{:U('comment')}");
+             	xhr.timeout = 30000;
+             	xhr.ontimeout = function(event){
+             		  console('timeout');
+                 	}
+             	//xhr.upload.onprogress = updateprogress;
+             	xhr.send(formData);
+             	
+                    
+             }
+
+            function state_change(){
+                if(xhr.readyState==4 && xhr.status == 200){
+                    console.log(xhr.response);
+                    var text = '<i class="icon-ok" > 评论成功 ! </i> ';
+                    $(".top-right").notify({message:{html:text},type:"success"}).show()
+                }
+            }
+    		
+
+    	})
+    	$('#subcomment').on('shown.bs.modal',function(e){
+
+    		$("#subcomment").find('.modal-body textarea').focus();
+
+		});
+
+    	*/
+
+    	
+    })
+        $(function(){
+    	
+        //自动加载
+        var stop=true;
+        $(window).scroll(function(){
+            totalheight = parseFloat($(window).height()) + parseFloat($(window).scrollTop());
+            if($(document).height() <= totalheight){
+                if(stop==true){
+                	$("#Loading").html("正在加载<i class='icon-spinner icon-spin'></i>");
+                    stop=false;
+                    $.post("{:U('ajax_comment')}", {
+                    		id:$("#Loading").attr("data-id"),
+                    		page:$("#Loading").attr("data-page"),
+                    	
+                    	},function(txt){
+                    		if(txt != ""){
+                    			
+    	                        $("#Loading").before(txt);
+    	                        $("#Loading").html("加载更多");
+    	                        $("#Loading").attr("data-page",parseInt($("#Loading").attr("data-page")) + 1);
+                            	stop=true;
+                    			
+                    		}else{
+                    			$("#Loading").html("没有更多");
+                    		}
+                    },"text");
+                }
+            }
+        });
+    	
+    	$("#Loading").click(function(){
+    		
+    		$(window).scroll();
+    		return false;
+    	})
+    	
+    })
+
+</script>
+</body>
+</html>

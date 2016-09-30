@@ -1,0 +1,26 @@
+﻿<volist name="data" id="d">
+<div class="list-group-item ">
+<div class="media">
+<div class="media-left"><img class="center-block img-circle" src="<if condition='$d.isshow eq 1'>{$default_avatar}<else />{$d.avatar|default=$default_avatar}64</if>"  ></div>
+<div class="media-body">
+<h5 class="list-group-item-heading"><a href="{:U('detail',array('id'=>$d[id]))}" >{$d.title}</a> 
+</h5>
+<p class=" help-block text-left"><small> <if condition="$d.isshow eq 1">匿名<else />{$d.name}</if> {$d.create_date|date="m月d",###} </small>
+</p>
+<p class="list-group-item-text">{$d.text}...</p>
+<h5 class="help-block text-right">
+<small class=""> 
+<i class="icon-eye-open"></i> ({$d.view_count}) &nbsp; &nbsp;
+<i class="icon-comment-alt"></i> ({$d.cc})
+</small>
+</h5>
+<p>
+<a href="{:U('forum_edit' ,array('id'=>$d[id]))}" class="btn btn-success btn-xs ">编辑</a>						
+<a href="{:U('forum_delete' ,array('id'=>$d[id]))}"  class="btn btn-success btn-xs del">删除</a>	
+<a href="{:U('forum_status' ,array('id'=>$d[id]))}" class="btn btn-success btn-xs status"><if condition="$d['status'] eq 1" >取消审核<else />审核</if></a>
+<a href="{:U('forum_top' ,array('id'=>$d[id]))}" class="btn btn-success btn-xs top"><if condition="$d[istop] eq 1" >取消置顶<else />置顶</if></a>
+</p>
+</div>
+</div>
+</div>
+</volist>

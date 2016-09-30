@@ -1,0 +1,148 @@
+﻿<include file="common-header" />
+    <style type="text/css">
+	.imgheader{font-size:22px;}
+	.media{border-bottom:1px solid #f1f1f1;}
+	body{padding-top:60px;}
+    </style>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+	<include file="common-nav" />
+
+
+    <!-- Begin page content -->
+    <div class="container">
+    <!-- Split button -->
+    
+		<div class="row">  
+		    
+		<div class="list-group">
+			<div  class="list-group-item">
+				<div class="media">
+					<div class="media-body">
+					<p>
+					<a href="{:U('category_add')}" class="btn btn-success btn-xs">添加分类</a>
+					</p>
+					</div>
+				</div>
+			</div>
+		
+		<volist name="data" id="d" >
+			<div class="list-group-item " id="{$d.id}">
+				<div class="media">
+					<div class="media-left"><i class="icon-comment-alt imgheader"></i>
+					</div>
+					<div class="media-body">
+						<h6 class="list-group-item-heading">
+						<a href="{:U('forum' ,array('id'=>$d[id]))}">{$d.title}</a> 
+						</h6>
+						<p class="list-group-item-text">{$d.description}...</p>
+						<p class="help-block text-right">
+						<small> 
+						 {$d.ct} 个话题
+						</small>
+						</p>
+						<p>
+						<a href="{:U('category_edit' ,array('id'=>$d[id]))}" class="btn btn-success btn-xs edit">编辑</a>
+						<a href="{:U('category_del' ,array('id'=>$d[id]))}" class="btn btn-success btn-xs del">删除</a>
+						
+						</p>
+					</div>
+					            
+				</div>
+			</div>
+		</volist>
+		      
+		</div>
+		    
+		</div>  
+	</div>
+    
+    <include file="common-footer" />
+    
+    <script>
+    $(function(){
+    	
+    	/*
+    	$(".edit").confirm({
+    		title:false,
+    		content:'<h5>话题编辑</h5>		  <div class="form-group">' +
+			'<input name="title" type="text" class="form-control" placeholder="分类名称" value="{$data.title}"/>'+
+			'<input name="id" type="hidden" value="{$data.id}" />'+
+		  	'</div><div class="form-group">'+
+			'<textarea name="description" class="form-control" rows="3" placeholder="分类描述">{$data.description}</textarea>'+
+		 	'</div>',
+    		confirm:function(){
+    			
+    		},
+    		cancel:function(){
+    			
+    			
+    		}
+    	})
+    	
+    	*/
+    	$(".del").confirm({
+    	    title: false,
+    	    content: '删除将不可恢复!',
+    	    confirmButton:"确定",
+    	    cancelButton:"取消",
+    	    closeIcon: false,
+    	    theme: 'black',
+    	    backgroundDismiss: false,
+    	    confirm: function(){
+    	        $.post(
+    	        		this.$target.attr("href"),{},function(d){
+    	        			if(d > 0 ){
+    	        				
+    	        				var s = '#'+d
+        	        			$(s).remove();
+    	        			}else{
+    	        				/*
+    	        				$.alert({
+    	        					title:'警告',
+    	        					content:'分类下有话题 无法删除!'
+    	        				})
+    	        				*/
+    	        			}
+    	        			
+    	        		}
+    	        		
+    	        );
+    	    },
+    	    cancel: function(){
+    	        
+    	    }
+    	});
+    	
+        //自动加载
+        var stop=true;
+        $("#Loading").click(function(){
+        	
+        	
+            totalheight = parseFloat($(window).height()) + parseFloat($(window).scrollTop());
+            
+            if($(document).height() <= totalheight){
+            	console.log(totalheight)
+            	$("#Loading").html("正在加载<i class='icon-spinner icon-spin'></i>");
+                if(stop==true){
+                    stop=false;
+                    $.post("{:U('listajax')}", {state:2, n:50},function(txt){
+                        $("#Loading").before(txt);
+                        $("#Loading").html("加载更多");
+                        stop=true;
+                    },"text");
+                }
+            }
+        });
+        
+        
+    	
+    	
+    	
+    })
+    </script>
+  </body>
+</html>

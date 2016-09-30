@@ -1,0 +1,121 @@
+﻿<include file="common-header" />
+    <style type="text/css">
+
+    </style>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+
+
+    <!-- Begin page content -->
+    <div class="container">
+    <!-- Split button -->
+
+		<div class="row">
+		
+		<div class="col-xs-12" style="background: gainsboro;margin-top: -10px;">
+		<div class="media">
+	      <div class="media-left media-middle">
+	        <a href="#">
+	          <img class="img-circle"  src="{$user.avatar|default=$default_avatar}"  style="width:68px; height:68px">
+	        </a>
+	      </div>
+	      <div class="media-body" data-link="{:U('comment_detail',array('id'=>$c[id]))}">
+	        <h5>{$user.name}  {$user.user}</h5>
+	        <p>{$user.position}</p>
+	        <p>{$user.email}</p> 
+	        <p>{$user.mobile}</p> 
+	      </div>
+	    </div>
+	    </div>
+	    <div class="clearfix"></div>
+    
+		<div class="list-group">
+
+		<volist name="data" id="d">
+			<a href="{:U('detail',array('id'=>$d[id]))}" class="list-group-item ">
+				<div class="media">
+					<div class="media-body">
+						<h5 class="list-group-item-heading">{$d.title}<span class="red small pull-right"><if condition="$d.istop eq 1"><i class="icon-double-angle-up" ></i></if></span></h5>
+						<p class=" help-block text-left"><small> <if condition="$d.isshow eq 1">匿名<else />{$d.name}</if> {$d.create_date|date="m月d",###} </small></p>
+					</div>
+					            
+				</div>
+			</a>
+		</volist>
+
+		      
+		</div>
+			<a href="#" id="Loading" class="list-group-item text-center" data-id="{$id}" data-page="1" >
+				加载更多 
+			</a>
+		    
+		</div>  
+	</div>
+    
+	<include file="common-footer" />
+
+    <script>
+    $(function(){
+    	
+    	$('#search').click(function(){
+    		
+    		$('form').submit();
+    	})
+    	$('form').submit(function(){
+    		
+    		$.post("{:U('search_ajax')}",$("form").serialize(),function(d){
+    			
+    			$('.list-group').html('')
+    			.append(d)
+    		})
+    		
+    		return false;
+    		
+    	})
+    	
+        //自动加载
+        var stop=true;
+        $(window).scroll(function(){
+        	
+        	
+            totalheight = parseFloat($(window).height()) + parseFloat($(window).scrollTop());
+            
+            if($(document).height() <= totalheight){
+            	console.log(totalheight)
+            	
+                if(stop==true){
+                	$("#Loading").html("正在加载<i class='icon-spinner icon-spin'></i>");
+                    stop=false;
+                    $.post("{:U('profile')}", {
+                    		page:$("#Loading").attr("data-page"),
+                    	
+                    	},function(txt){
+                    		if(txt != ""){
+                    			
+    	                        $(".list-group").append(txt);
+    	                        $("#Loading").html("加载更多");
+    	                        $("#Loading").attr("data-page",parseInt($("#Loading").attr("data-page")) + 1);
+                            	stop=true;
+                    			
+                    		}else{
+                    			$("#Loading").html("没有更多");
+                    		}
+                    },"text");
+                }
+            }
+        });
+    	$("#Loading").click(function(){
+    		
+    		$(window).scroll();
+    		return false;
+    	})
+
+    	
+    	
+    })
+    </script>
+  </body>
+</html>

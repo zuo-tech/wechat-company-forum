@@ -1,0 +1,160 @@
+﻿<include file="common-header" />
+    <style type="text/css">
+	.imgheader{font-size:22px;}
+	.media{border-bottom:1px solid #f1f1f1;}
+	body{padding-top:60px;font-size:12px;}
+    </style>
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+	<include file="common-nav" />
+
+
+    <!-- Begin page content -->
+    <div class="container">
+    <!-- Split button -->
+    
+		<div class="row">  
+		<div class="col-xs-12">
+		<form action="" class="form-inline">
+			
+			<table>
+			<tr>
+				<td><input type="text" class="form-control" value="" id="dpd1"><td>
+				<td><input type="text" class="form-control" value="" id="dpd2"><td>
+				<td><input type="submit" class="btn btn-success" value="查询" ><td>
+			</tr>
+			</table>
+				
+			
+			
+		
+		</form>
+		</div>
+		</div>
+		<div class="list-group">
+
+		<table class="table">
+		<thead>
+			<tr>
+				<th width="25%">时间</th>
+				<th width="25%">管理员</th>
+				<th width="50%">事件</th>
+			</tr>
+		</thead>
+		<tbody>
+		<volist name="data" id="d" >
+			<tr>
+				<td>{$d.createtime|date="Y-m-d H:i:s",###}</td>
+				<td>{$d.operator}</td>
+				<td>{$d.info}</td>
+			</tr>
+		</volist>
+		
+		</tbody>
+		</table>
+    <a href="#" id="Loading" class="list-group-item text-center" data-id="{$data.id}" data-page="1" >
+				加载更多 
+	</a>
+		      
+		</div>
+		    
+		</div>  
+	</div>
+    
+    <include file="common-footer" />
+    
+    <script>
+    $(function(){
+    	
+    	var date_start = "",date_end = "";
+    	
+    	$("form").submit(function(){
+    		date_start = $("#dpd1").val()
+    		date_end = $("#dpd2").val()
+            $.post("{:U('logs')}", {
+        		page:0,
+        		date_start:date_start,
+        		date_end:date_end,
+        	
+        	},function(txt){
+        			
+                    $(".table tbody").html(txt);
+                    $("#Loading").html("加载更多");
+                    $("#Loading").attr("data-page",1);
+                	stop=true;
+        			
+        	},"text");
+
+    		
+    		return false;
+    	})
+    	
+    	
+        //自动加载
+        var stop=true;
+        $(window).scroll(function(){
+            totalheight = parseFloat($(window).height()) + parseFloat($(window).scrollTop());
+            if($(document).height() <= totalheight){
+                if(stop==true){
+                	$("#Loading").html("正在加载<i class='icon-spinner icon-spin'></i>");
+                    stop=false;
+                    $.post("{:U('logs')}", {
+	                    	date_start:date_start,
+	                		date_end:date_end,
+                    		page:$("#Loading").attr("data-page"),
+                    	
+                    	},function(txt){
+                    		if(txt != ""){
+                    			
+    	                        $(".table tbody").append(txt);
+    	                        $("#Loading").html("加载更多");
+    	                        $("#Loading").attr("data-page",parseInt($("#Loading").attr("data-page")) + 1);
+                            	stop=true;
+                    			
+                    		}else{
+                    			$("#Loading").html("没有更多");
+                    		}
+                    },"text");
+                }
+            }
+        });
+    	
+    	$("#Loading").click(function(){
+    		
+    		$(window).scroll();
+    		return false;
+    	})
+    	
+    	
+    	
+    	
+    	var nowTemp = new Date();
+    	var now = new Date(nowTemp.getFullYear(), nowTemp.getMonth(), nowTemp.getDate(), 0, 0, 0, 0);
+    	 
+    	var checkin = $('#dpd1').datepicker({
+    	  onRender: function(date) {
+    	    //return date.valueOf() < now.valueOf() ? 'disabled' : '';
+    	  }
+    	}).on('changeDate', function(ev) {
+    	  if (ev.date.valueOf() > checkout.date.valueOf()) {
+    	    var newDate = new Date(ev.date)
+    	    newDate.setDate(newDate.getDate() + 1);
+    	    checkout.setValue(newDate);
+    	  }
+    	  checkin.hide();
+    	  $('#dpd2')[0].focus();
+    	}).data('datepicker');
+    	var checkout = $('#dpd2').datepicker({
+    	  onRender: function(date) {
+    	    //return date.valueOf() <= checkin.date.valueOf() ? 'disabled' : '';
+    	  }
+    	}).on('changeDate', function(ev) {
+    	  checkout.hide();
+    	}).data('datepicker');
+    })
+    </script>
+  </body>
+</html>
